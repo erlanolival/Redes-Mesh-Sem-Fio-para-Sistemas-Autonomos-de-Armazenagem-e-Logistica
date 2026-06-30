@@ -49,6 +49,26 @@ from reports.plot_generator import (
     plot_energy_comparison
 )
 
+def benchmark_algorithm(func, args, benchmark_runs):
+    """
+    Executa um algoritmo várias vezes sobre o mesmo grafo
+    para obter um tempo médio de execução.
+    """
+
+    result = None
+
+    start = time.perf_counter()
+
+    for _ in range(benchmark_runs):
+        result = func(*args)
+
+    elapsed = (
+        time.perf_counter() - start
+    ) * 1000
+
+    avg_time = elapsed / benchmark_runs
+
+    return result, avg_time
 # ==========================================================
 # ENTRADA DO USUÁRIO
 # ==========================================================
@@ -184,16 +204,11 @@ for devices in range(
         # BRUTE FORCE
         # ==================================================
 
-        start = time.time()
-
-        bf_result = brute_force.solve(
-            edges,
-            devices
+        bf_result, bf_time = benchmark_algorithm(
+            brute_force.solve,
+            (edges, devices),
+            1
         )
-
-        bf_time = (
-            time.time() - start
-        ) * 1000
 
         optimal_cover = bf_result["cover"]
 
@@ -201,44 +216,31 @@ for devices in range(
         # BACKTRACKING
         # ==================================================
 
-        start = time.time()
-
-        bt_result = backtracking.solve(
-            edges,
-            devices
+        bt_result, bt_time = benchmark_algorithm(
+            backtracking.solve,
+            (edges, devices),
+            200
         )
-
-        bt_time = (
-            time.time() - start
-        ) * 1000
 
         # ==================================================
         # GREEDY
         # ==================================================
 
-        start = time.time()
-
-        greedy_result = greedy.solve(
-            edges
+        greedy_result, greedy_time = benchmark_algorithm(
+            greedy.solve,
+            (edges,),
+            1000
         )
-
-        greedy_time = (
-            time.time() - start
-        ) * 1000
 
         # ==================================================
         # EDGE GREEDY
         # ==================================================
 
-        start = time.time()
-
-        edge_result = edge_greedy.solve(
-            edges
+        edge_result, edge_time = benchmark_algorithm(
+            edge_greedy.solve,
+            (edges,),
+            1000
         )
-
-        edge_time = (
-            time.time() - start
-        ) * 1000
 
         # ==================================================
         # MÉTRICAS DO GRAFO
@@ -350,6 +352,12 @@ for devices in range(
                     "energy": energy
                 }
             )
+
+            graph_metrics = {
+                "density": [],
+                "connectivity": [],
+                "average_degree": []
+            }
 
     # ======================================================
     # RESUMO POR QUANTIDADE DE DISPOSITIVOS

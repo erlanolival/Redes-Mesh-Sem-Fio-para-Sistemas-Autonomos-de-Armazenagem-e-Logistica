@@ -97,7 +97,7 @@ Os experimentos foram executados utilizando os seguintes parâmetros:
 | Parâmetro                     | Valor       |
 | ----------------------------- | ----------- |
 | Número mínimo de dispositivos | 8           |
-| Número máximo de dispositivos | 30          |
+| Número máximo de dispositivos | 26          |
 | Área de cobertura             | 10 m2 |
 | Alcance WiFi                  | 8 m         |
 | Distribuição superior         | 70%         |

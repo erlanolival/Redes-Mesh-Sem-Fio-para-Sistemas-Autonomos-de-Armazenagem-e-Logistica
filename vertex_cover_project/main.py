@@ -54,7 +54,7 @@ def benchmark_algorithm(func, args, benchmark_runs):
     Executa um algoritmo várias vezes sobre o mesmo grafo
     para obter um tempo médio de execução.
     """
-
+    func(*args)  # Executa uma vez para aquecimento
     result = None
 
     start = time.perf_counter()
@@ -179,6 +179,12 @@ for devices in range(
         "EdgeGreedy": []
     }
 
+    graph_metrics = {
+        "density": [],
+        "connectivity": [],
+        "average_degree": []
+    }
+
     for run in range(
         1,
         NUM_RUNS + 1
@@ -253,6 +259,18 @@ for devices in range(
         conn = connectivity(
             edges,
             devices
+        )
+
+        graph_metrics["density"].append(
+            density
+        )
+
+        graph_metrics["connectivity"].append(
+            conn
+        )
+
+        graph_metrics["average_degree"].append(
+            avg_degree
         )
 
         # ==================================================
@@ -335,6 +353,8 @@ for devices in range(
                     len(cover),
                     round(exec_time, 4),
                     round(density, 4),
+                    round(conn, 4),
+                    round(avg_degree, 4),
                     round(error, 4),
                     round(ratio, 4),
                     graph_file
@@ -353,15 +373,21 @@ for devices in range(
                 }
             )
 
-            graph_metrics = {
-                "density": [],
-                "connectivity": [],
-                "average_degree": []
-            }
-
     # ======================================================
     # RESUMO POR QUANTIDADE DE DISPOSITIVOS
     # ======================================================
+
+    avg_density = statistics.mean(
+        graph_metrics["density"]
+    )
+
+    avg_connectivity = statistics.mean(
+        graph_metrics["connectivity"]
+    )
+
+    avg_average_degree = statistics.mean(
+        graph_metrics["average_degree"]
+    )
 
     for alg_name in algorithms_stats:
 
@@ -409,8 +435,9 @@ for devices in range(
                 round(avg_vc, 4),
                 round(avg_time, 4),
                 round(std_time, 4),
-                round(density, 4),
-                round(conn, 4),
+                round(avg_density, 4),
+                round(avg_connectivity, 4),
+                round(avg_average_degree, 4),
                 round(avg_energy, 4),
                 round(avg_error, 4),
                 round(avg_ratio, 4),
@@ -456,6 +483,38 @@ plot_execution_time_comparison(
     avg_time_greedy,
     avg_time_edge,
     f"{PLOTS_FOLDER}/execution_time_comparison.png"
+)
+
+plot_vc_size_comparison(
+    device_axis,
+    avg_vc_bf,
+    avg_vc_bt,
+    avg_vc_greedy,
+    avg_vc_edge,
+    f"{PLOTS_FOLDER}/vc_size_comparison.png"
+)
+
+plot_error_comparison(
+    device_axis,
+    avg_error_greedy,
+    avg_error_edge,
+    f"{PLOTS_FOLDER}/error_comparison.png"
+)
+
+plot_approximation_comparison(
+    device_axis,
+    avg_ratio_greedy,
+    avg_ratio_edge,
+    f"{PLOTS_FOLDER}/approximation_comparison.png"
+)
+
+plot_energy_comparison(
+    device_axis,
+    avg_energy_bf,
+    avg_energy_bt,
+    avg_energy_greedy,
+    avg_energy_edge,
+    f"{PLOTS_FOLDER}/energy_comparison.png"
 )
 
 print("\nExperimento finalizado.")
